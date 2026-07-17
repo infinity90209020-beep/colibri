@@ -1,0 +1,25 @@
+name: Nex-N2 backend
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev, 'agent/**']
+
+permissions:
+  contents: read
+
+jobs:
+  nex-backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile
+        run: python -m py_compile nex/coli_nex.py
+      - name: Unit tests
+        run: python -m unittest discover -s nex/tests -p 'test_*.py'
+      - name: Dry-run launch profile
+        run: python nex/coli_nex.py serve --profile fast-h200x8-fp8 --dry-run
